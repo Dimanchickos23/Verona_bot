@@ -1,0 +1,10 @@
+aiogram~=2.18
+aioredis~=2.0
+environs~=9.0
+apscheduler
+alembic
+sqlalchemy
+psycopg2-binary
+asyncpg
+redis
+apscheduler_di

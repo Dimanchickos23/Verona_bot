@@ -1,6 +1,7 @@
 from aiogram import Dispatcher, Bot, types
 from aiogram.types import CallbackQuery
 
+from tgbot.infrastructure.database.functions import delete_user
 from tgbot.keyboards.inline import survey_keyboard
 from tgbot.misc import Survey
 
@@ -19,9 +20,8 @@ async def user_join(join: types.ChatJoinRequest):
                                                                                          "выслать свои данные менеджеру по развитию моделей.")
 
 
-async def user_left(left: types.ChatMemberLeft):
-    # тут удаляем из БД
-    pass
+async def user_left(left: types.ChatMemberLeft, session):
+    await delete_user(session, left.user.id)
 
 
 async def start_survey(cb: CallbackQuery):

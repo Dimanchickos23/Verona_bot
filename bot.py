@@ -8,6 +8,7 @@ from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler_di import ContextSchedulerDecorator
 
+from set_bot_commands import set_default_commands
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.handlers.admin import register_admin
@@ -46,11 +47,6 @@ def register_all_handlers(dp):
     register_echo(dp)
 
 
-# async def send_message_to_admin(bot: Bot, config: Config):
-#     for admin_id in config.tg_bot.admin_ids:
-#         await bot.send_message(text="Сообщение по выбранной дате", chat_id=admin_id)
-
-
 async def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -71,25 +67,21 @@ async def main():
         "default": RedisJobStore(
             jobs_key="dispatched_trips_jobs", run_times_key="dispatched_trips_running",
             # параметры host и port необязательны, для примера показано как передавать параметры подключения
-            host="redis_cache", port=6379, password=config.tg_bot.redis_password
+            host="localhost", port=6379, password=config.tg_bot.redis_password
+            # host="redis_cache", port=6379, password=config.tg_bot.redis_password
         )
     }
 
+
     # Оборачиваем AsyncIOScheduler специальным классом
     scheduler = ContextSchedulerDecorator(AsyncIOScheduler(jobstores=job_stores))
-    #
-    # # Добавляем зависимости таска в некий контекст
-    # scheduler.ctx.add_instance(bot, declared_class=Bot)
-    # scheduler.ctx.add_instance(config, declared_class=Config)
-    #
-    # # Добавляем задачи на выполнение
-    # # scheduler.add_job(send_message_to_admin, "interval", seconds=5)
-    # scheduler.add_job(send_message_to_admin, 'date', run_date=datetime(2022, 10, 7, 15, 25, 5))
     bot['config'] = config
 
     register_all_middlewares(dp, config, scheduler, session_pool=session_pool)
     register_all_filters(dp)
     register_all_handlers(dp)
+
+    await set_default_commands(dp)
 
     # start
     try:

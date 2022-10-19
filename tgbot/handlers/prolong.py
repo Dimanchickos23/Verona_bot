@@ -43,8 +43,9 @@ async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSM
     logging.info(f"{user_id}")
     await update_user(session, m.from_user.id, subscription_type='favorite')
 
-    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=300), kwargs=dict(user_id=user_id))
-    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=310), kwargs=dict(user_id=user_id))
+    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=89), kwargs=dict(user_id=user_id))
+    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=90), kwargs=dict(user_id=user_id))
+    # scheduler.add_job(update_user, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=90), kwargs=dict(session=session, telegram_id=m.from_user.id, subscription_type='NULL'))
     await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
                                                            f"tg://user?id={user_id}") + " оформлена подписка на 90 дней.")
     await state.finish()
@@ -77,9 +78,15 @@ async def add_p(m: types.Message):
     await Prolong.P.set()
 
 
+async def delete_sub(m: types.Message, session):
+    user_id = m.forward_from.id
+    await update_user(session, user_id, subscription_type='NULL')
+
+
 def register_prolong(dp: Dispatcher):
-    dp.register_message_handler(add_f, Command("add_f"))
-    dp.register_message_handler(add_p, Command("add_p"))
+    dp.register_message_handler(add_f, Command("add_f"), is_admin=True)
+    dp.register_message_handler(add_p, Command("add_p"), is_admin=True)
+    dp.register_message_handler(delete_sub, Command("del_sub"), is_admin=True)
     dp.register_callback_query_handler(end_contract, lambda callback_query: callback_query.data == "contract_end")
     dp.register_message_handler(add_favorite, content_types=types.ContentType.PHOTO, state=Prolong.F)
     dp.register_message_handler(add_perspective, content_types=types.ContentType.ANY, state=Prolong.P)

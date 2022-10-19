@@ -10,13 +10,6 @@ from tgbot.misc import Survey
 
 async def name_answer(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
-    # await state.update_data(
-    #     {
-    #         "answer1": answer
-    #     }
-    # )
-    # async with state.proxy() as data:
-    #     data["answer1"] = answer
     await message.answer("Введите ваш возраст:")
     await Survey.Age.set()
 

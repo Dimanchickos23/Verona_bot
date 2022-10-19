@@ -20,6 +20,7 @@ class Prolong(StatesGroup):
 class NewPost(StatesGroup):
     EnterMessage = State()
     When = State()
+    Channel = State()
     Confirm = State()
     Final = State()
 

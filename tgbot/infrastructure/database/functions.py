@@ -1,6 +1,6 @@
 from typing import Callable, AsyncContextManager
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -31,10 +31,18 @@ async def get_user(session, telegram_id: int):
     result = await session.scalars(stmt)
     return result.first()
 
-async def create_user(session, telegram_id,
-                                  full_name,
-                                  username):
 
+async def delete_user(session, telegram_id: int):
+    stmt = delete(
+        User
+    ).where(User.telegram_id == telegram_id)
+
+    await session.scalars(stmt)
+
+
+async def create_user(session, telegram_id,
+                      full_name,
+                      username):
     await session.execute(
         insert(
             User
@@ -45,6 +53,7 @@ async def create_user(session, telegram_id,
         )
     )
     await session.commit()
+
 
 async def update_user(session, telegram_id, **kwargs):
     stmt = update(

@@ -16,6 +16,7 @@ class Survey(StatesGroup):
 class Prolong(StatesGroup):
     F = State()
     P = State()
+    D = State()
 
 class NewPost(StatesGroup):
     EnterMessage = State()

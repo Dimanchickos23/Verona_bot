@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Dispatcher, Bot, types
 from aiogram.types import CallbackQuery
 
@@ -20,8 +22,10 @@ async def user_join(join: types.ChatJoinRequest):
                                                                                          "выслать свои данные менеджеру по развитию моделей.")
 
 
-async def user_left(left: types.ChatMemberLeft, session):
-    await delete_user(session, left.user.id)
+#не работает
+async def user_left(left: types.ChatMemberUpdated, session):
+    logging.info(f"{left.from_user.id}")
+    await delete_user(session, left.from_user.id)
 
 
 async def start_survey(cb: CallbackQuery):
@@ -32,5 +36,5 @@ async def start_survey(cb: CallbackQuery):
 def register_user(dp: Dispatcher):
     dp.register_chat_join_request_handler(user_join, state="*")
     dp.register_callback_query_handler(start_survey, lambda callback_query: callback_query.data == "survey_start", state="*")
-    dp.register_chat_member_handler(user_left, state="*")
+    dp.register_my_chat_member_handler(user_left, state="*")
 

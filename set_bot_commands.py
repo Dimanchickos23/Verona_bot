@@ -11,4 +11,4 @@ async def set_default_commands(dp):
                                   "пользователя"),
         types.BotCommand("del_sub", "Удалить статус подписки у пользователя. Команда вводится в forward message от"
                                     "пользователя")
-    ], scope=BotCommandScopeAllChatAdministrators())
+    ])

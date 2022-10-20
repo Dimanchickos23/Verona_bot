@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from tgbot.keyboards.inline import confirmation_keyboard, post_callback, channels_keyboard
+from tgbot.keyboards.inline import confirmation_keyboard, post_callback, channels_keyboard, channel_cb
 from tgbot.misc.states import NewPost
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -79,9 +79,9 @@ async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: Asy
     target_channel = data.get("channel")
 
     casting = InlineKeyboardMarkup(row_width=1)
-    confirm = InlineKeyboardButton(text="Откликнуться", callback_data=user_id)
+    confirm = InlineKeyboardButton(text="Откликнуться", callback_data=channel_cb.new(action='confirm', id=user_id, name=call.from_user.full_name))
     casting.insert(confirm)
-    cancel = InlineKeyboardButton(text="Отказаться", callback_data=user_id)
+    cancel = InlineKeyboardButton(text="Отказаться", callback_data=channel_cb.new(action='decline', id=user_id, name=call.from_user.full_name))
     casting.insert(cancel)
 
     message = await message.send_copy(chat_id=target_channel, reply_markup=casting)

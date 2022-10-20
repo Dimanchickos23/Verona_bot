@@ -24,4 +24,4 @@ class PerspectiveFilter(BoundFilter):
         session = data.get('session')
         user: User = await get_user(session, user_id)
         logging.info(f'User {user.full_name}, has subscription_type = {user.subscription_type}')
-        return (user.subscription_type == 'favorite') == self.is_perspective
+        return (user.subscription_type == 'perspective') == self.is_perspective

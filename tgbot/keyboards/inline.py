@@ -40,7 +40,7 @@ confirmation_keyboard = InlineKeyboardMarkup(
 channels_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Girls", callback_data="-1001657141038"),
+            InlineKeyboardButton(text="Girls", callback_data="-1001816253590"),
             InlineKeyboardButton(text="GUYS", callback_data="-1001682352777"),
         ],
         [
@@ -49,3 +49,5 @@ channels_keyboard = InlineKeyboardMarkup(
         ]
 ]
 )
+
+channel_cb = CallbackData('post', 'action', 'id', 'name')

@@ -9,14 +9,16 @@ from aiogram.utils.markdown import hlink
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from tgbot.config import Config
-from tgbot.filters.filters_data import favorite, perspective
 from tgbot.infrastructure.database.functions import update_user
 from tgbot.keyboards.inline import prolong_keyboard
 from tgbot.misc.states import Prolong
 
 
 async def remove_favorite(user_id: int):
-    # favorite.remove(user_id)
+    dp = Dispatcher.get_current()
+    session_pool = dp.middleware.applications[0].kwargs.get('session_pool')
+    async with session_pool() as session:
+        await update_user(session, telegram_id=user_id, subscription_type=None)
     bot = Bot.get_current()
     m = await bot.send_message(user_id,
                                f"У вас кончилась подписка")  # тут надо как то отправить сообщение админу, что у пользователя кончилась подписка
@@ -42,14 +44,12 @@ async def prolong_handler(user_id: int):
 async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSMContext, session):
     user_id = m.forward_from.id
     logging.info(f"{user_id}")
-    await update_user(session, user_id, subscription_type='favorite')
-
-    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=60),
+    await update_user(session, telegram_id=user_id, subscription_type='favorite')
+    await update_user(session, telegram_id=user_id, subscription_type='favorite')
+    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=1),
                       kwargs=dict(user_id=user_id))
-    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=1),
+    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=5),
                       kwargs=dict(user_id=user_id))
-    # scheduler.add_job(update_user, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=1),
-    #                   args=(session, user_id), kwargs=dict(subscription_type='NULL'))
     await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
                                                 f"tg://user?id={user_id}") + " оформлена подписка на 90 дней.")
     await state.finish()
@@ -57,7 +57,7 @@ async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSM
 
 async def add_perspective(m: types.Message, state: FSMContext, session):
     user_id = m.forward_from.id
-    await update_user(session, user_id, subscription_type='perspective')
+    await update_user(session, telegram_id=user_id, subscription_type='perspective')
     await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
                                                 f"tg://user?id={user_id}") + " оформлена вечная подписка.")
     await state.finish()
@@ -102,3 +102,4 @@ def register_prolong(dp: Dispatcher):
     dp.register_message_handler(add_favorite, content_types=types.ContentType.PHOTO, state=Prolong.F)
     dp.register_message_handler(add_perspective, content_types=types.ContentType.ANY, state=Prolong.P)
     dp.register_message_handler(delete_sub, content_types=types.ContentType.PHOTO, state=Prolong.D)
+

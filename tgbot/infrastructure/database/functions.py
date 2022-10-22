@@ -55,11 +55,11 @@ async def create_user(session, telegram_id,
     await session.commit()
 
 
-async def update_user(session, telegram_id, **kwargs):
-    stmt = update(
+async def update_user(session, telegram_id, subscription_type):
+    statement = update(
         User
     ).where(User.telegram_id == telegram_id).values(
-        **kwargs
+        subscription_type=subscription_type
     )
-    await session.execute(stmt)
+    await session.execute(statement)
     await session.commit()

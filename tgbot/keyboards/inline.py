@@ -36,18 +36,18 @@ confirmation_keyboard = InlineKeyboardMarkup(
         InlineKeyboardButton(text="Отклонить пост", callback_data=post_callback.new(action="cancel")),
     ]]
 )
-
+# Test_channel_id=-1001816253590
 channels_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Girls", callback_data="-1001816253590"),
+            InlineKeyboardButton(text="Girls", callback_data="-1001657141038"),
             InlineKeyboardButton(text="GUYS", callback_data="-1001682352777"),
         ],
         [
             InlineKeyboardButton(text="KIDS", callback_data="-1001553289773"),
             InlineKeyboardButton(text="PLUS_SIZE", callback_data="-1001503006255"),
         ]
-]
+    ]
 )
 
 channel_cb = CallbackData('post', 'action', 'id', 'name')

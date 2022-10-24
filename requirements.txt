@@ -1,9 +1,9 @@
-aiogram~=2.18
+aiogram==2.22.2
 aioredis~=2.0
 environs~=9.0
 apscheduler
 alembic
-sqlalchemy
+sqlalchemy==1.4.42
 psycopg2-binary
 asyncpg
 redis

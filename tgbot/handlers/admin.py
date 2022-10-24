@@ -1,6 +1,6 @@
 import datetime
 
-from aiogram import Dispatcher, Bot
+from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery
@@ -50,7 +50,7 @@ async def confirm_post(call: CallbackQuery, state: FSMContext):
     await NewPost.next()
     await call.message.edit_reply_markup()
     await call.message.answer("Вы отправили пост на проверку")
-    await call.message.answer(f"Пользователь {mention} хочет сделать пост длительностью {hours}:")
+    await call.message.answer(f"Пользователь {mention} хочет сделать пост длительностью {hours} часов:")
     await call.message.answer(text, parse_mode="HTML", reply_markup=confirmation_keyboard)
 
 
@@ -88,7 +88,7 @@ async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: Asy
     mes_id = message.message_id
     text = message.text
     ch_id = message.chat.id
-    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now()+datetime.timedelta(seconds=hours), kwargs=dict(message_id=mes_id, message_text=text, chat_id=ch_id))
+    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now()+datetime.timedelta(hours=hours), kwargs=dict(message_id=mes_id, message_text=text, chat_id=ch_id))
     await state.finish()
 
 
@@ -105,7 +105,7 @@ def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
     dp.register_message_handler(reset_state, commands=["reset"], state="*", is_admin=True)
     dp.register_message_handler(create_post, Command("create_post"), is_admin=True)
-    dp.register_message_handler(enter_message, state=NewPost.EnterMessage)
+    dp.register_message_handler(enter_message,content_types=types.ContentType.ANY, state=NewPost.EnterMessage)
     dp.register_message_handler(when_close_post, state=NewPost.When)
     dp.register_callback_query_handler(choose_channel, state=NewPost.Channel)
     dp.register_callback_query_handler(confirm_post, post_callback.filter(action="post"), state=NewPost.Confirm)

@@ -32,12 +32,14 @@ async def prolong_handler(user_id: int):
     bot = Bot.get_current()
     await bot.send_message(user_id,
                            "Добрый день!\n"
-                           "У нас скоро заканчивается контракт с Вами, скажите, пожалуйста, Вам было бы интересно "
+                           "У нас завтра заканчивается контракт с Вами, скажите, пожалуйста, Вам было бы интересно "
                            "продление?\n"
                            "Чтобы больше замотивировать наших моделей на работу, доступ в чат теперь будет платным, "
                            "5000 рублей за 3 месяца.\n"
+                           "Продлить доступ можно по ссылке ниже -- выберите продукт «Доступ в чаты трудоустройства».\n"
                            "Мы же со своей стороны постараемся Вас развивать и активно показывать клиентам, если Вам "
-                           "интересно реализоваться в этой сфере.", reply_markup=prolong_keyboard)
+                           "интересно реализоваться в этой сфере."
+                           , reply_markup=prolong_keyboard)
     await bot.send_message(user_id, "По всем вопросам можете писать @lkrioni")
 
 
@@ -45,10 +47,9 @@ async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSM
     user_id = m.forward_from.id
     logging.info(f"{user_id}")
     await update_user(session, telegram_id=user_id, subscription_type='favorite')
-    await update_user(session, telegram_id=user_id, subscription_type='favorite')
-    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=1),
+    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=89),
                       kwargs=dict(user_id=user_id))
-    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=5),
+    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=90),
                       kwargs=dict(user_id=user_id))
     await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
                                                 f"tg://user?id={user_id}") + " оформлена подписка на 90 дней.")
@@ -75,7 +76,7 @@ async def end_contract(cb: CallbackQuery):
 
 async def add_f(m: types.Message):
     await Prolong.F.set()
-    await m.answer("Перешлите фото чека пользователя. После этого будет оформлена подписка на 90 дней.")
+    await m.answer("Перешлите только фото чека пользователя. После этого будет оформлена подписка на 90 дней.")
 
 
 async def add_p(m: types.Message):
@@ -85,6 +86,8 @@ async def add_p(m: types.Message):
 
 async def delete_sub(m: types.Message, session, state: FSMContext):
     user_id = m.forward_from.id
+    await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
+                                                f"tg://user?id={user_id}") + " удален статус подписки.")
     await update_user(session, user_id, subscription_type='NULL')
     await state.finish()
 
@@ -101,5 +104,5 @@ def register_prolong(dp: Dispatcher):
     dp.register_callback_query_handler(end_contract, lambda callback_query: callback_query.data == "contract_end")
     dp.register_message_handler(add_favorite, content_types=types.ContentType.PHOTO, state=Prolong.F)
     dp.register_message_handler(add_perspective, content_types=types.ContentType.ANY, state=Prolong.P)
-    dp.register_message_handler(delete_sub, content_types=types.ContentType.PHOTO, state=Prolong.D)
+    dp.register_message_handler(delete_sub, content_types=types.ContentType.ANY, state=Prolong.D)
 

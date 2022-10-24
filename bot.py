@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from apscheduler.jobstores.redis import RedisJobStore
@@ -57,7 +57,8 @@ async def main():
 
     # Чтобы работал Redis brew services start/stop/restart redis
 
-    storage = RedisStorage2(host='redis_cache', password=config.tg_bot.redis_password) if config.tg_bot.use_redis else MemoryStorage()
+    storage = RedisStorage2(host='redis_cache',
+                            password=config.tg_bot.redis_password) if config.tg_bot.use_redis else MemoryStorage()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher(bot, storage=storage)
 
@@ -72,7 +73,6 @@ async def main():
         )
     }
 
-
     # Оборачиваем AsyncIOScheduler специальным классом
     scheduler = ContextSchedulerDecorator(AsyncIOScheduler(jobstores=job_stores))
     bot['config'] = config
@@ -86,7 +86,7 @@ async def main():
     # start
     try:
         scheduler.start()  # запускаем шедулер
-        await dp.start_polling()
+        await dp.start_polling(allowed_updates=["message", "callback_query", "chat_member", "chat_join_request"])
     finally:
         await dp.storage.close()
         await dp.storage.wait_closed()

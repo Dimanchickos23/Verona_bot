@@ -4,6 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Regexp
 from aiogram.types import CallbackQuery
 
+from tgbot.config import Config
 from tgbot.keyboards.inline import end_survey, url
 from tgbot.misc import Survey
 
@@ -79,14 +80,17 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext):
     bot = Bot.get_current()
     data = await state.get_data()
     anketa = data.get("anketa")
-    await bot.send_message(331572613, anketa, disable_web_page_preview=True)  # chat_id, string
-    await cb.message.answer("Также, если у вас нет видео-визитки и снэпов желательно записаться на это занятие,"
-                            " так как на большинство кастингов требуются эти материалы ⬇️.", reply_markup=url)
+    config: Config = bot.get('config')
+    admin = config.tg_bot.admin_ids[0]
+    await bot.send_message(admin, anketa, disable_web_page_preview=True)  # chat_id, string
+    await cb.message.answer("Также, если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
+                            "так как на большинство кастингов требуются эти материалы.\n"
+                            "Записаться можно по ссылке "
+                            "ниже. Выберите продукт «оплата съёмки snaps&video introduction»  ⬇️"
+                            , reply_markup=url)
     await cb.message.answer("После оплаты вышлите чек @nzsz13")
     await state.finish()
-    await cb.message.answer("Если есть часы на абонементе-позвоните куратору.")
-    # await state.finish()
-
+    await cb.message.answer("Если есть часы на абонементе -- позвоните куратору.")
     # ⬇️ await state.reset_state(with_data=False) сбрасывает состояние, сохраняя данные
 
 

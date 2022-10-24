@@ -14,7 +14,7 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict):
     bot = Bot.get_current()
     await cb.answer("Спасибо за отклик")
     await bot.send_message(chat_id=cb.from_user.id, text="Свяжитесь с " + hlink(f"{who_posted_fullname}",
-                                                                                f"tg://user?id={who_posted_id}") + "чтобы узнать "
+                                                                                f"tg://user?id={who_posted_id}") + " чтобы узнать "
                                                                                                                    "подробнее про "
                                                                                                                    "кастинг.")
 

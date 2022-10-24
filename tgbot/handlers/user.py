@@ -2,7 +2,9 @@ import logging
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.types import CallbackQuery
+from aiogram.utils.markdown import hlink
 
+from tgbot.config import Config
 from tgbot.infrastructure.database.functions import delete_user
 from tgbot.keyboards.inline import survey_keyboard
 from tgbot.misc import Survey
@@ -23,9 +25,14 @@ async def user_join(join: types.ChatJoinRequest):
 
 
 #не работает
-async def user_left(left: types.ChatMemberUpdated, session):
-    logging.info(f"{left.from_user.id}")
-    await delete_user(session, left.from_user.id)
+async def user_left(m: types.ChatMember, session):
+    logging.info(f"{m.user.id}")
+    await delete_user(session, m.user.id)
+    bot = Bot.get_current()
+    config: Config = bot.get('config')
+    admin = config.tg_bot.admin_ids[0]
+    await bot.send_message(admin, hlink(f"{m.user.full_name}", f"tg://user?id={m.user.id}") +
+                           f" вышел из канала")
 
 
 async def start_survey(cb: CallbackQuery):
@@ -36,5 +43,6 @@ async def start_survey(cb: CallbackQuery):
 def register_user(dp: Dispatcher):
     dp.register_chat_join_request_handler(user_join, state="*")
     dp.register_callback_query_handler(start_survey, lambda callback_query: callback_query.data == "survey_start", state="*")
-    dp.register_my_chat_member_handler(user_left, state="*")
+    dp.chat_member_handler(user_left, state="*")
+
 

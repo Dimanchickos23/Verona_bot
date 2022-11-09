@@ -5,6 +5,7 @@ from aiogram.dispatcher.filters import Regexp
 from aiogram.types import CallbackQuery
 
 from tgbot.config import Config
+from tgbot.infrastructure.database.functions import update_anketa
 from tgbot.keyboards.inline import end_survey, url
 from tgbot.misc import Survey
 
@@ -76,12 +77,13 @@ async def disk_answer(message: types.Message, state: FSMContext):
     await message.answer(beginning + anketa + ending, disable_web_page_preview=True, reply_markup=end_survey)
 
 
-async def ended_survey(cb: CallbackQuery, state: FSMContext):
+async def ended_survey(cb: CallbackQuery, state: FSMContext, session):
     bot = Bot.get_current()
     data = await state.get_data()
     anketa = data.get("anketa")
     config: Config = bot.get('config')
     admin = config.tg_bot.admin_ids[0]
+    await update_anketa(session, telegram_id=cb.from_user.id, anketa=anketa)
     await bot.send_message(admin, anketa, disable_web_page_preview=True)  # chat_id, string
     await cb.message.answer("Также, если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
                             "так как на большинство кастингов требуются эти материалы.\n"

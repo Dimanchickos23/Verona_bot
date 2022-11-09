@@ -14,12 +14,14 @@ class Survey(StatesGroup):
 
 
 class Prolong(StatesGroup):
-    F = State()
+    F1 = State()
+    F2 = State()
     P = State()
     D = State()
 
 class NewPost(StatesGroup):
     EnterMessage = State()
+    EnterPhoto = State()
     When = State()
     Channel = State()
     Confirm = State()

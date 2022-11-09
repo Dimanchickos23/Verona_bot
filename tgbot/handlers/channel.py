@@ -4,19 +4,30 @@ from aiogram import Dispatcher, Bot, types
 from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.utils.markdown import hlink
 
+from tgbot.infrastructure.database.functions import get_user
+from tgbot.infrastructure.database.users import User
 from tgbot.keyboards.inline import channel_cb
 
 
-async def confirm_offer(cb: CallbackQuery, callback_data: dict):
+async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
     who_posted_id = int(callback_data['id'])
     who_posted_fullname = callback_data['name']
     logging.info(f"{who_posted_id=}")
     bot = Bot.get_current()
     await cb.answer("Спасибо за отклик")
-    await bot.send_message(chat_id=cb.from_user.id, text="Свяжитесь с " + hlink(f"{who_posted_fullname}",
-                                                                                f"tg://user?id={who_posted_id}") + " чтобы узнать "
-                                                                                                                   "подробнее про "
-                                                                                                                   "кастинг.")
+    await bot.send_message(chat_id=cb.from_user.id,
+                           text="Спасибо за отклик!\n" + "Пожалуйста, пришлите все необходимые материалы " + hlink(
+                               f"{who_posted_fullname}",
+                               f"tg://user?id={who_posted_id}"))
+    user: User = await get_user(session, cb.from_user.id)
+    anketa = user.anketa
+    await bot.send_message(chat_id=who_posted_id, text="Модель " + hlink(
+                               f"{cb.from_user.full_name}",
+                               f"tg://user?id={cb.from_user.id}") + f" откликнулась на кастинг:\n"
+                                                                    f"{cb.message.text}\n\n"
+                                                                    f"Вот ее анкета:\n"
+                                                                    f"{anketa}",
+                           disable_web_page_preview=True)
 
 
 async def decline_offer(cb: CallbackQuery, callback_data: dict):

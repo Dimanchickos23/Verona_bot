@@ -63,3 +63,13 @@ async def update_user(session, telegram_id, subscription_type):
     )
     await session.execute(statement)
     await session.commit()
+
+
+async def update_anketa(session, telegram_id, anketa):
+    statement = update(
+        User
+    ).where(User.telegram_id == telegram_id).values(
+        anketa=anketa
+    )
+    await session.execute(statement)
+    await session.commit()

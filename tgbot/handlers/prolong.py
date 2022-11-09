@@ -36,24 +36,13 @@ async def prolong_handler(user_id: int):
                            "продление?\n"
                            "Чтобы больше замотивировать наших моделей на работу, доступ в чат теперь будет платным, "
                            "5000 рублей за 3 месяца.\n"
-                           "Продлить доступ можно по ссылке ниже -- выберите продукт «Доступ в чаты трудоустройства».\n"
+                           "Продлить доступ можно по ссылке ниже. Выберите продукт «Доступ в чаты трудоустройства».\n"
                            "Мы же со своей стороны постараемся Вас развивать и активно показывать клиентам, если Вам "
-                           "интересно реализоваться в этой сфере."
+                           "интересно реализоваться в этой сфере.\n"
+                           "После оплаты отправьте чек @nzsz13"
                            , reply_markup=prolong_keyboard)
     await bot.send_message(user_id, "По всем вопросам можете писать @lkrioni")
 
-
-async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSMContext, session):
-    user_id = m.forward_from.id
-    logging.info(f"{user_id}")
-    await update_user(session, telegram_id=user_id, subscription_type='favorite')
-    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=89),
-                      kwargs=dict(user_id=user_id))
-    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=90),
-                      kwargs=dict(user_id=user_id))
-    await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
-                                                f"tg://user?id={user_id}") + " оформлена подписка на 90 дней.")
-    await state.finish()
 
 
 async def add_perspective(m: types.Message, state: FSMContext, session):
@@ -75,8 +64,29 @@ async def end_contract(cb: CallbackQuery):
 
 
 async def add_f(m: types.Message):
-    await Prolong.F.set()
-    await m.answer("Перешлите только фото чека пользователя. После этого будет оформлена подписка на 90 дней.")
+    await Prolong.F1.set()
+    await m.answer("На сколько дней вы хотите оформить подписку?\nВведите число")
+
+
+async def how_long(m: types.Message, state: FSMContext):
+    await state.update_data(days=int(m.text))
+    await Prolong.F2.set()
+    await m.answer(f"Перешлите только фото чека пользователя. После этого будет оформлена подписка на {m.text} дней.")
+
+
+async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSMContext, session):
+    user_id = m.forward_from.id
+    logging.info(f"{user_id}")
+    data = await state.get_data()
+    days = data.get("days")
+    await update_user(session, telegram_id=user_id, subscription_type='favorite')
+    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=days-1),
+                      kwargs=dict(user_id=user_id))
+    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=days),
+                      kwargs=dict(user_id=user_id))
+    await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
+                                                f"tg://user?id={user_id}") + f" оформлена подписка на {days} дней.")
+    await state.finish()
 
 
 async def add_p(m: types.Message):
@@ -102,7 +112,8 @@ def register_prolong(dp: Dispatcher):
     dp.register_message_handler(add_p, Command("add_p"), is_admin=True)
     dp.register_message_handler(del_sub, Command("del_sub"), is_admin=True)
     dp.register_callback_query_handler(end_contract, lambda callback_query: callback_query.data == "contract_end")
-    dp.register_message_handler(add_favorite, content_types=types.ContentType.PHOTO, state=Prolong.F)
+    dp.register_message_handler(how_long, state=Prolong.F1)
+    dp.register_message_handler(add_favorite, content_types=types.ContentType.PHOTO, state=Prolong.F2)
     dp.register_message_handler(add_perspective, content_types=types.ContentType.ANY, state=Prolong.P)
     dp.register_message_handler(delete_sub, content_types=types.ContentType.ANY, state=Prolong.D)
 

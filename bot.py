@@ -11,7 +11,7 @@ from apscheduler_di import ContextSchedulerDecorator
 from set_bot_commands import set_default_commands
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
-from tgbot.handlers.admin import register_admin
+from tgbot.handlers.make_post import register_admin
 from tgbot.handlers.echo import register_echo
 from tgbot.handlers.user import register_user
 from tgbot.filters.favorite import FavoriteFilter

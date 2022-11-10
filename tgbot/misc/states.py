@@ -30,3 +30,8 @@ class NewPost(StatesGroup):
 
 class DataState(StatesGroup):
     One = State()
+
+
+class SuperAdmin(StatesGroup):
+    AddAdmin = State()
+    DeleteAdmin = State()

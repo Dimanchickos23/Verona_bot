@@ -120,7 +120,7 @@ async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: Asy
     message = await message.send_copy(chat_id=target_channel, reply_markup=casting)
     mes_id = message.message_id
     text = message.text
-    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now()+datetime.timedelta(hours=hours), kwargs=dict(message_id=mes_id, message_text=text, chat_id=target_channel))
+    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now()+datetime.timedelta(seconds=hours), kwargs=dict(message_id=mes_id, message_text=text, chat_id=target_channel))
     await state.finish()
 
 

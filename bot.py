@@ -11,8 +11,10 @@ from apscheduler_di import ContextSchedulerDecorator
 from set_bot_commands import set_default_commands
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
+from tgbot.filters.super_admin import SuperAdminFilter
 from tgbot.handlers.make_post import register_admin
 from tgbot.handlers.echo import register_echo
+from tgbot.handlers.super_admin import register_super_admin
 from tgbot.handlers.user import register_user
 from tgbot.filters.favorite import FavoriteFilter
 from tgbot.filters.perspective import PerspectiveFilter
@@ -35,10 +37,12 @@ def register_all_filters(dp):
     dp.filters_factory.bind(AdminFilter)
     dp.filters_factory.bind(FavoriteFilter)
     dp.filters_factory.bind(PerspectiveFilter)
+    dp.filters_factory.bind(SuperAdminFilter)
 
 
 def register_all_handlers(dp):
     register_prolong(dp)
+    register_super_admin(dp)
     register_admin(dp)
     register_user(dp)
     register_test(dp)

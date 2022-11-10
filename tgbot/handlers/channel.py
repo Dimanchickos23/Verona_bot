@@ -14,7 +14,7 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
     who_posted_fullname = callback_data['name']
     logging.info(f"{who_posted_id=}")
     bot = Bot.get_current()
-    await cb.answer("Спасибо за отклик")
+    await cb.answer("Спасибо за отклик", cache_time=10)
     await bot.send_message(chat_id=cb.from_user.id,
                            text="Спасибо за отклик!\n" + "Пожалуйста, пришлите все необходимые материалы " + hlink(
                                f"{who_posted_fullname}",
@@ -31,7 +31,7 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
 
 
 async def decline_offer(cb: CallbackQuery, callback_data: dict):
-    await cb.answer("Спасибо за отклик")
+    await cb.answer("Спасибо за отклик", cache_time=10)
     who_posted_id = int(callback_data['id'])
     logging.info(f"{who_posted_id=}")
     bot = Bot.get_current()
@@ -41,7 +41,7 @@ async def decline_offer(cb: CallbackQuery, callback_data: dict):
 
 
 async def not_sub(cb: CallbackQuery):
-    await cb.answer("Вы не оплатили подписку на канал.")
+    await cb.answer("Вы не оплатили подписку на канал.", cache_time=10)
 
 
 def register_channel(dp: Dispatcher):

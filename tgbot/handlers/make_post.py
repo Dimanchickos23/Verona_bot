@@ -47,7 +47,7 @@ async def enter_photo_end(message: Message, state: FSMContext):
 async def when_close_post(message: Message, state: FSMContext):
     await state.update_data(hours=int(message.text))
     await message.answer(f"В какой канал отправить пост?",
-                          reply_markup=channels_keyboard)
+                         reply_markup=channels_keyboard)
     await NewPost.next()
 
 
@@ -55,7 +55,7 @@ async def choose_channel(call: CallbackQuery, state: FSMContext):
     await call.answer()
     await state.update_data(channel=call.data)
     await call.message.answer(f"Вы собираетесь отправить пост на проверку?",
-                         reply_markup=confirmation_keyboard)
+                              reply_markup=confirmation_keyboard)
     await NewPost.next()
 
 
@@ -92,10 +92,11 @@ async def _post_unknown(message: Message):
 
 async def close_casting(message_id: int, message_text: str, chat_id: int):
     bot = Bot.get_current()
-    await bot.edit_message_text(message_text + "\n<b>Закрыто</b>", chat_id, message_id, parse_mode="HTML", reply_markup=None)
+    await bot.edit_message_text(message_text + "\n<b>Закрыто</b>", chat_id, message_id,
+                                parse_mode="HTML", reply_markup=None)
 
 
-async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: AsyncIOScheduler, state: FSMContext):
+async def approve_post(call: CallbackQuery, callback_data: dict, scheduler: AsyncIOScheduler, state: FSMContext):
     await call.answer("Вы одобрили этот пост.", show_alert=True)
 
     message = await call.message.edit_reply_markup()
@@ -106,9 +107,13 @@ async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: Asy
     photos = data.get("photos")
 
     casting = InlineKeyboardMarkup(row_width=2)
-    confirm = InlineKeyboardButton(text="Откликнуться", callback_data=channel_cb.new(action='confirm', id=user_id, name=call.from_user.full_name))
+    confirm = InlineKeyboardButton(text="Откликнуться",
+                                   callback_data=channel_cb.new(action='confirm',
+                                                                id=user_id, name=call.from_user.full_name))
     casting.insert(confirm)
-    cancel = InlineKeyboardButton(text="Отказаться", callback_data=channel_cb.new(action='decline', id=user_id, name=call.from_user.full_name))
+    cancel = InlineKeyboardButton(text="Отказаться", callback_data=channel_cb.new(action='decline',
+                                                                                  id=user_id,
+                                                                                  name=call.from_user.full_name))
     casting.insert(cancel)
 
     if photos:
@@ -120,7 +125,8 @@ async def approve_post(call: CallbackQuery, callback_data: dict,  scheduler: Asy
     message = await message.send_copy(chat_id=target_channel, reply_markup=casting)
     mes_id = message.message_id
     text = message.text
-    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now()+datetime.timedelta(seconds=hours), kwargs=dict(message_id=mes_id, message_text=text, chat_id=target_channel))
+    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=hours),
+                      kwargs=dict(message_id=mes_id, message_text=text, chat_id=target_channel))
     await state.finish()
 
 
@@ -137,13 +143,15 @@ def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
     dp.register_message_handler(reset_state, commands=["reset"], state="*", is_admin=True)
     dp.register_message_handler(create_post, Command("create_post"), is_admin=True)
-    dp.register_message_handler(enter_message,content_types=types.ContentType.ANY, state=NewPost.EnterMessage)
-    dp.register_message_handler(enter_photo,content_types=types.ContentType.PHOTO, state=NewPost.EnterPhoto)
+    dp.register_message_handler(enter_message, content_types=types.ContentType.ANY, state=NewPost.EnterMessage)
+    dp.register_message_handler(enter_photo, content_types=types.ContentType.PHOTO, state=NewPost.EnterPhoto)
     dp.register_message_handler(enter_photo_end, text="отправил", state=NewPost.EnterPhoto)
     dp.register_message_handler(when_close_post, state=NewPost.When)
     dp.register_callback_query_handler(choose_channel, state=NewPost.Channel)
     dp.register_callback_query_handler(confirm_post, post_callback.filter(action="post"), state=NewPost.Confirm)
     dp.register_callback_query_handler(cancel_post, post_callback.filter(action="cancel"), state=NewPost.Confirm)
     dp.register_message_handler(_post_unknown, state=NewPost.Confirm)
-    dp.register_callback_query_handler(approve_post, post_callback.filter(action="post"), is_admin=True, state=NewPost.Final)
-    dp.register_callback_query_handler(decline_post, post_callback.filter(action="cancel"), is_admin=True, state=NewPost.Final)
+    dp.register_callback_query_handler(approve_post, post_callback.filter(action="post"), is_admin=True,
+                                       state=NewPost.Final)
+    dp.register_callback_query_handler(decline_post, post_callback.filter(action="cancel"), is_admin=True,
+                                       state=NewPost.Final)

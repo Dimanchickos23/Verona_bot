@@ -1,5 +1,6 @@
 import datetime
 import logging
+from random import randint
 
 from aiogram import types, Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
@@ -23,8 +24,9 @@ async def remove_favorite(user_id: int):
     m = await bot.send_message(user_id,
                                f"У вас кончилась подписка")  # тут надо как то отправить сообщение админу, что у пользователя кончилась подписка
     config: Config = bot.get('config')
-    admin = config.tg_bot.admin_ids[0]
-    await bot.send_message(admin, "У " + hlink(f"{m.chat.full_name}",
+    admins = config.tg_bot.admin_ids
+    a = randint(0, len(admins) - 1)
+    await bot.send_message(admins[a], "У " + hlink(f"{m.chat.full_name}",
                                                f"tg://user?id={m.chat.id}") + " закончилась подписка.")
 
 

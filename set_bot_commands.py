@@ -10,4 +10,6 @@ async def set_default_commands(dp):
         types.BotCommand("del_sub", "Удалить статус подписки у пользователя."),
         types.BotCommand("add_admin", "Добавить админа."),
         types.BotCommand("del_admin", "Удалить админа.")
-    ])
+    ],
+    scope=BotCommandScopeAllChatAdministrators()
+    )

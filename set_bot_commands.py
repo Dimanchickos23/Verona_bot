@@ -2,8 +2,8 @@ from aiogram import types
 from aiogram.types import BotCommandScopeAllChatAdministrators
 
 
-async def set_default_commands(dp):
-    await dp.bot.set_my_commands(commands=[
+async def set_all_chat_admins_commands(dp):
+    return await dp.bot.set_my_commands(commands=[
         types.BotCommand("create_post", "Создать публикацию на n часов в выбранном канале."),
         types.BotCommand("add_f", "Установить пользователю подписку на 90 дней."),
         types.BotCommand("add_p", "Установить вечную подписку пользователю."),

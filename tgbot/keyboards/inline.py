@@ -46,6 +46,9 @@ channels_keyboard = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="KIDS", callback_data="-1001553289773"),
             InlineKeyboardButton(text="PLUS_SIZE", callback_data="-1001503006255"),
+        ],
+        [
+            InlineKeyboardButton(text="Girls 35+", callback_data="-1001616464016")   
         ]
     ]
 )

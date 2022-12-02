@@ -17,7 +17,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 async def admin_start(message: Message):
     await message.reply("Hello, admin!")
     bot = Bot.get_current()
-    await set_all_admins_commands(bot, message.chat.id, message.from_user.id)
+    await set_all_admins_commands(bot, message.chat.id)
 
 
 async def create_post(message: Message):

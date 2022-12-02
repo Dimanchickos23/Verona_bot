@@ -3,7 +3,7 @@ from aiogram.types import BotCommandScopeAllChatAdministrators, BotCommandScopeD
     BotCommandScopeAllGroupChats, BotCommandScopeChatMember, BotCommandScopeChat
 
 
-async def set_all_admins_commands(bot: Bot, chat_id: int, user_id: int):
+async def set_all_admins_commands(bot: Bot, chat_id: int):
     return await bot.set_my_commands(commands=[
         types.BotCommand("create_post", "Создать публикацию на n часов в выбранном канале."),
         types.BotCommand("add_f", "Установить пользователю подписку на 90 дней."),
@@ -14,7 +14,7 @@ async def set_all_admins_commands(bot: Bot, chat_id: int, user_id: int):
     )
 
 
-async def set_all_super_admins_commands(bot: Bot, chat_id: int, user_id: int):
+async def set_all_super_admins_commands(bot: Bot, chat_id: int):
     return await bot.set_my_commands(commands=[
         types.BotCommand("create_post", "Создать публикацию на n часов в выбранном канале."),
         types.BotCommand("add_f", "Установить пользователю подписку на 90 дней."),

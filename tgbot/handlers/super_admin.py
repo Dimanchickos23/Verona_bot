@@ -11,7 +11,7 @@ from tgbot.misc.states import SuperAdmin
 async def super_admin_start(message: Message):
     await message.reply("Hello, super admin!")
     bot = Bot.get_current()
-    await set_all_super_admins_commands(bot, message.chat.id, message.from_user.id)
+    await set_all_super_admins_commands(bot, message.chat.id)
 
 
 async def add_admin1(message: types.Message):

@@ -43,20 +43,9 @@ async def start_survey(cb: CallbackQuery):
     await Survey.FIO.set()
 
 
-async def user_msg(m: types.Message):
-    await m.answer_sticker("CAACAgIAAxkBAAEBcu1jcQSpGQABhH8I8Vx148-usjz0X0cAAgEBAAJWnb0KIr6fDrjC5jQrBA")
-    await asyncio.sleep(2)
-    await m.answer(f"Привет, {m.from_user.full_name}! Я бот модельного"
-                   f" агенства Верона. Я размещаю для вас кастинги, оформляю подписку"
-                   f" на канал и напоминаю об ее окончании. К сожалению, я подчиняюсь"
-                   f" только админам каналов и вы не можете мною управлять.\n"
-                   f"Если есть какие-то вопросы, обращайтесь к" + hlink(" Елизавете", "https://t.me/lkrioni"),
-                   disable_web_page_preview=True)
-
-
 def register_user(dp: Dispatcher):
     dp.register_chat_join_request_handler(user_join, state="*")
     dp.register_callback_query_handler(start_survey, lambda callback_query: callback_query.data == "survey_start",
                                        state="*")
     dp.chat_member_handler(user_left, state="*")
-    dp.register_message_handler(user_msg, state="*", content_types=types.ContentTypes.ANY)
+

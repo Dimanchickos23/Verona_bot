@@ -8,12 +8,13 @@ from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler_di import ContextSchedulerDecorator
 
-from set_bot_commands import set_all_chat_admins_commands
+from reset_commands import force_reset_all_commands
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.filters.super_admin import SuperAdminFilter
 from tgbot.handlers.make_post import register_admin
 from tgbot.handlers.echo import register_echo
+from tgbot.handlers.service_msgs import register_service
 from tgbot.handlers.super_admin import register_super_admin
 from tgbot.handlers.user import register_user
 from tgbot.filters.favorite import FavoriteFilter
@@ -34,10 +35,11 @@ def register_all_middlewares(dp, config, scheduler, session_pool):
 
 
 def register_all_filters(dp):
+    dp.filters_factory.bind(SuperAdminFilter)
     dp.filters_factory.bind(AdminFilter)
     dp.filters_factory.bind(FavoriteFilter)
     dp.filters_factory.bind(PerspectiveFilter)
-    dp.filters_factory.bind(SuperAdminFilter)
+
 
 
 def register_all_handlers(dp):
@@ -45,10 +47,10 @@ def register_all_handlers(dp):
     register_super_admin(dp)
     register_admin(dp)
     register_test(dp)
-    register_channel(dp)
-
     register_user(dp)
-    register_echo(dp)
+    register_channel(dp)
+    register_service(dp)
+    #register_echo(dp)
 
 
 async def main():
@@ -72,7 +74,7 @@ async def main():
         "default": RedisJobStore(
             jobs_key="dispatched_trips_jobs", run_times_key="dispatched_trips_running",
             # параметры host и port необязательны, для примера показано как передавать параметры подключения
-            # host="localhost", port=6379, password=config.tg_bot.redis_password
+            #host="localhost", port=6379, password=config.tg_bot.redis_password
             host="redis_cache", port=6379, password=config.tg_bot.redis_password
         )
     }
@@ -85,7 +87,7 @@ async def main():
     register_all_filters(dp)
     register_all_handlers(dp)
 
-    await set_all_chat_admins_commands(bot)
+    await force_reset_all_commands(bot)
 
     # start
     try:
@@ -95,8 +97,8 @@ async def main():
         await dp.storage.close()
         await dp.storage.wait_closed()
         await bot.session.close()
-        scheduler.remove_all_jobs()
-        # scheduler.shutdown()
+        #scheduler.remove_all_jobs()
+        scheduler.shutdown()
 
 
 if __name__ == '__main__':

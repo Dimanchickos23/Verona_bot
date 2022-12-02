@@ -15,4 +15,4 @@ class SuperAdminFilter(BoundFilter):
         if self.is_super_admin is None:
             return False
         config: Config = obj.bot.get('config')
-        return (obj.from_user.id in config.tg_bot.super_admin_ids) == self.is_super_admin
+        return (obj.from_user.id in config.tg_bot.super_ids) == self.is_super_admin

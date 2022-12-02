@@ -10,6 +10,9 @@ survey_keyboard = InlineKeyboardMarkup(inline_keyboard=[
 end_survey = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text="📝 Выслать данные", callback_data="survey_end")
+    ],
+    [
+        InlineKeyboardButton(text="🆘 В анкете ошибка!", callback_data="error")
     ]
 ])
 
@@ -40,7 +43,7 @@ confirmation_keyboard = InlineKeyboardMarkup(
 channels_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Girls", callback_data="-1001657141038"),
+            InlineKeyboardButton(text="Girls", callback_data="-1001816253590"),
             InlineKeyboardButton(text="GUYS", callback_data="-1001682352777"),
         ],
         [
@@ -48,7 +51,7 @@ channels_keyboard = InlineKeyboardMarkup(
             InlineKeyboardButton(text="PLUS_SIZE", callback_data="-1001503006255"),
         ],
         [
-            InlineKeyboardButton(text="Girls 35+", callback_data="-1001616464016")   
+            InlineKeyboardButton(text="Girls 35+", callback_data="-1001616464016")
         ]
     ]
 )

@@ -46,7 +46,6 @@ async def prolong_handler(user_id: int):
     await bot.send_message(user_id, "По всем вопросам можете писать @lkrioni")
 
 
-
 async def add_perspective(m: types.Message, state: FSMContext, session):
     user_id = m.forward_from.id
     await update_user(session, telegram_id=user_id, subscription_type='perspective')
@@ -82,9 +81,9 @@ async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSM
     data = await state.get_data()
     days = data.get("days")
     await update_user(session, telegram_id=user_id, subscription_type='favorite')
-    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=days-1),
+    scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=days-1),
                       kwargs=dict(user_id=user_id))
-    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=days),
+    scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=days),
                       kwargs=dict(user_id=user_id))
     await m.answer(f"Для пользователя " + hlink(f"{m.forward_from.full_name}",
                                                 f"tg://user?id={user_id}") + f" оформлена подписка на {days} дней.")

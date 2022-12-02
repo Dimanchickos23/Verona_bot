@@ -7,6 +7,7 @@ from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery, MediaGroup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from reset_commands import set_all_admins_commands
 from tgbot.keyboards.inline import confirmation_keyboard, post_callback, channels_keyboard, channel_cb
 from tgbot.misc.states import NewPost
 
@@ -15,6 +16,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 async def admin_start(message: Message):
     await message.reply("Hello, admin!")
+    bot = Bot.get_current()
+    await set_all_admins_commands(bot, message.chat.id, message.from_user.id)
 
 
 async def create_post(message: Message):
@@ -125,14 +128,15 @@ async def approve_post(call: CallbackQuery, callback_data: dict, scheduler: Asyn
     message = await message.send_copy(chat_id=target_channel, reply_markup=casting)
     mes_id = message.message_id
     text = message.text
-    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now() + datetime.timedelta(seconds=hours),
+    scheduler.add_job(close_casting, 'date', run_date=datetime.datetime.now() + datetime.timedelta(hours=hours),
                       kwargs=dict(message_id=mes_id, message_text=text, chat_id=target_channel))
     await state.finish()
 
 
-async def decline_post(call: CallbackQuery):
+async def decline_post(call: CallbackQuery, state: FSMContext):
     await call.answer("Вы отклонили этот пост.", show_alert=True)
     await call.message.edit_reply_markup()
+    await state.finish()
 
 
 async def reset_state(message: Message, state: FSMContext):
@@ -141,6 +145,7 @@ async def reset_state(message: Message, state: FSMContext):
 
 def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
+    dp.register_message_handler(reset_state, commands=["reset"], state="*", is_super_admin=True)
     dp.register_message_handler(reset_state, commands=["reset"], state="*", is_admin=True)
     dp.register_message_handler(create_post, Command("create_post"), is_admin=True)
     dp.register_message_handler(enter_message, content_types=types.ContentType.ANY, state=NewPost.EnterMessage)

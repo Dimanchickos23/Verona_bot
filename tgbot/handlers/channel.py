@@ -16,9 +16,12 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
     bot = Bot.get_current()
     await cb.answer("Спасибо за отклик", cache_time=10)
     await bot.send_message(chat_id=cb.from_user.id,
-                           text="Спасибо за отклик!\n" + "Пожалуйста, пришлите все необходимые материалы " + hlink(
-                               f"{who_posted_fullname}",
-                               f"tg://user?id={who_posted_id}"))
+                           text="Спасибо за отклик!\n" + "Пожалуйста, пришлите все необходимые материалы, "
+                                                         "если нужно что-то помимо ссылки на портфолио и параметров " +
+                                hlink(
+                                       f"{who_posted_fullname}",
+                                       f"tg://user?id={who_posted_id}"
+                                      ))
     user: User = await get_user(session, cb.from_user.id)
     anketa = user.anketa
     await bot.send_message(chat_id=who_posted_id, text="Модель " + hlink(

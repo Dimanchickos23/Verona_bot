@@ -18,49 +18,57 @@ from tgbot.misc import Survey
 
 async def name_answer(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await message.answer("Введите ваш возраст:")
+    await message.answer("Введите ваш возраст:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Age.set()
 
 
 async def age_answer(message: types.Message, state: FSMContext):
     await state.update_data(age=message.text)
-    await message.answer("Введите ваш рост в см:")
+    await message.answer("Введите ваш рост в см:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Height.set()
 
 
 async def height_answer(message: types.Message, state: FSMContext):
     await state.update_data(height=message.text)
-    await message.answer("Обхват груди в см:")
+    await message.answer("Обхват груди в см:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Bust.set()
 
 
 async def bust_answer(message: types.Message, state: FSMContext):
     await state.update_data(bust=message.text)
-    await message.answer("Обхват талии в см:")
+    await message.answer("Обхват талии в см:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Waist.set()
 
 
 async def waist_answer(message: types.Message, state: FSMContext):
     await state.update_data(waist=message.text)
-    await message.answer("Обхват бедер в см:")
+    await message.answer("Обхват бедер в см:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Hips.set()
 
 
 async def hips_answer(message: types.Message, state: FSMContext):
     await state.update_data(hips=message.text)
-    await message.answer("Введите ваш размер одежды (русский):")
+    await message.answer("Введите ваш размер одежды (русский):\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Size.set()
 
 
 async def size_answer(message: types.Message, state: FSMContext):
     await state.update_data(size=message.text)
-    await message.answer("Введите ваш размер ноги:")
+    await message.answer("Введите ваш размер ноги:\n"
+                         "(пришлите ответным сообщением только число)")
     await Survey.Leg_size.set()
 
 
 async def leg_answer(message: types.Message, state: FSMContext):
     await state.update_data(leg=message.text)
-    await message.answer("Ссылка на ваше портфолио на Яндекс диске‼️")
+    await message.answer("Ссылка на ваше портфолио на Яндекс диске‼️\n"
+                         "(пришлите ответным сообщением только ссылку)")
     await Survey.Disk.set()
 
 
@@ -87,6 +95,8 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
     bot = Bot.get_current()
     data = await state.get_data()
     anketa = data.get("anketa")
+    chat_id = data.get("chat_id")
+    chat_name = data.get("chat_name")
     config: Config = bot.get('config')
     admin = config.tg_bot.admin_ids[0]
     await update_anketa(session, telegram_id=cb.from_user.id, anketa=anketa)
@@ -99,7 +109,8 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
                                                 f"tg://user?id={cb.from_user.id}") + f" оформлена первая бесплатная"
                                                                                      f" подписка на 90 дней.")
     await bot.send_message(admin, anketa, disable_web_page_preview=True)  # chat_id, string
-    await cb.message.answer("Ура! теперь для вас оформлена подписка на чат с кастингами на 90 дней.\n"
+    await cb.message.answer("Ура! теперь для вас оформлена подписка на " + hlink(f"{chat_name}",
+                                                f"tg://user?id={chat_id}") + " с кастингами на 90 дней.\n"
                             "Также, если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
                             "так как на большинство кастингов требуются эти материалы.\n"
                             "Записаться можно по ссылке "
@@ -122,13 +133,13 @@ async def error_survey(cb: CallbackQuery, state: FSMContext):
 
 def register_test(dp: Dispatcher):
     dp.register_message_handler(name_answer, content_types=types.ContentType.TEXT, state=Survey.FIO)
-    dp.register_message_handler(age_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Age)
-    dp.register_message_handler(height_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Height)
-    dp.register_message_handler(bust_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Bust)
-    dp.register_message_handler(waist_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Waist)
-    dp.register_message_handler(hips_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Hips)
-    dp.register_message_handler(size_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Size)
-    dp.register_message_handler(leg_answer, Regexp(r'^[0-9]{1,15}$'), state=Survey.Leg_size)
+    dp.register_message_handler(age_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Age)
+    dp.register_message_handler(height_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Height)
+    dp.register_message_handler(bust_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Bust)
+    dp.register_message_handler(waist_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Waist)
+    dp.register_message_handler(hips_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Hips)
+    dp.register_message_handler(size_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Size)
+    dp.register_message_handler(leg_answer, Regexp(r'^[\d,.\s\-]{1,15}$'), state=Survey.Leg_size)
     dp.register_message_handler(disk_answer, Regexp(r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{'
                                                     r'1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)'), state=Survey.Disk)
     dp.register_callback_query_handler(ended_survey, lambda callback_query: callback_query.data == "survey_end",

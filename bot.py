@@ -12,6 +12,7 @@ from reset_commands import force_reset_all_commands
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.filters.super_admin import SuperAdminFilter
+from tgbot.handlers.anketa_errors import register_survey_error
 from tgbot.handlers.make_post import register_admin
 from tgbot.handlers.echo import register_echo
 from tgbot.handlers.service_msgs import register_service
@@ -41,16 +42,16 @@ def register_all_filters(dp):
     dp.filters_factory.bind(PerspectiveFilter)
 
 
-
 def register_all_handlers(dp):
     register_prolong(dp)
     register_super_admin(dp)
     register_admin(dp)
     register_test(dp)
+    register_survey_error(dp)
     register_user(dp)
     register_channel(dp)
     register_service(dp)
-    #register_echo(dp)
+    # register_echo(dp)
 
 
 async def main():
@@ -74,7 +75,7 @@ async def main():
         "default": RedisJobStore(
             jobs_key="dispatched_trips_jobs", run_times_key="dispatched_trips_running",
             # параметры host и port необязательны, для примера показано как передавать параметры подключения
-            #host="localhost", port=6379, password=config.tg_bot.redis_password
+            # host="localhost", port=6379, password=config.tg_bot.redis_password
             host="redis_cache", port=6379, password=config.tg_bot.redis_password
         )
     }
@@ -97,7 +98,7 @@ async def main():
         await dp.storage.close()
         await dp.storage.wait_closed()
         await bot.session.close()
-        #scheduler.remove_all_jobs()
+        # scheduler.remove_all_jobs()
         scheduler.shutdown()
 
 

@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Dispatcher, Bot, types
+from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hlink
 
@@ -11,13 +12,17 @@ from tgbot.keyboards.inline import survey_keyboard
 from tgbot.misc import Survey
 
 
-async def user_join(join: types.ChatJoinRequest):
+async def user_join(join: types.ChatJoinRequest, state: FSMContext):
     # тут мы принимаем юзера в канал
     await join.approve()
     # Тут надо занести в БД
 
     bot = Bot.get_current()
     # а тут отправляем сообщение
+    chat_id = join.chat.id
+    chat_name = join.chat.full_name
+    await Survey.Start.set()
+    await state.update_data(chat_id=chat_id, chat_name=chat_name)
     await bot.send_message(chat_id=join.from_user.id, reply_markup=survey_keyboard,
                            text="Привет! \n\n"
                                 "Поздравляем с прохождением кастинг-просмотра, теперь Вы "
@@ -46,6 +51,6 @@ async def start_survey(cb: CallbackQuery):
 def register_user(dp: Dispatcher):
     dp.register_chat_join_request_handler(user_join, state="*")
     dp.register_callback_query_handler(start_survey, lambda callback_query: callback_query.data == "survey_start",
-                                       state="*")
+                                       state=Survey.Start)
     dp.chat_member_handler(user_left, state="*")
 

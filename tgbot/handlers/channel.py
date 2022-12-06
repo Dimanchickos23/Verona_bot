@@ -16,17 +16,23 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
     bot = Bot.get_current()
     await cb.answer("Спасибо за отклик", cache_time=10)
     await bot.send_message(chat_id=cb.from_user.id,
-                           text="Спасибо за отклик!\n" + "Пожалуйста, пришлите все необходимые материалы " + hlink(
-                               f"{who_posted_fullname}",
-                               f"tg://user?id={who_posted_id}"))
+                           text="Спасибо за отклик!\n" +
+                                "Если для кастинга нужны другие материалы помимо ссылки на "
+                                f"портфолио и параметров, пожалуйста, пришлите их букеру –– " +
+                                hlink(
+                                    f"{who_posted_fullname}",
+                                    f"tg://user?id={who_posted_id}"
+                                ) + ".\n"
+                                    "В случае успешного прохождения кастинга, букер свяжется с вами."
+                           )
     user: User = await get_user(session, cb.from_user.id)
     anketa = user.anketa
     await bot.send_message(chat_id=who_posted_id, text="Модель " + hlink(
-                               f"{cb.from_user.full_name}",
-                               f"tg://user?id={cb.from_user.id}") + f" откликнулась на кастинг:\n"
-                                                                    f"{cb.message.text}\n\n"
-                                                                    f"Вот ее анкета:\n"
-                                                                    f"{anketa}",
+        f"{cb.from_user.full_name}",
+        f"tg://user?id={cb.from_user.id}") + f" откликнулась на кастинг:\n"
+                                             f"{cb.message.text}\n\n"
+                                             f"Вот ее анкета:\n"
+                                             f"{anketa}",
                            disable_web_page_preview=True)
 
 

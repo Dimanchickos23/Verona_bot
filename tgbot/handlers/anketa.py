@@ -95,8 +95,6 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
     bot = Bot.get_current()
     data = await state.get_data()
     anketa = data.get("anketa")
-    chat_id = data.get("chat_id")
-    chat_name = data.get("chat_name")
     config: Config = bot.get('config')
     admin = config.tg_bot.admin_ids[0]
     await update_anketa(session, telegram_id=cb.from_user.id, anketa=anketa)
@@ -109,16 +107,14 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
                                                 f"tg://user?id={cb.from_user.id}") + f" оформлена первая бесплатная"
                                                                                      f" подписка на 90 дней.")
     await bot.send_message(admin, anketa, disable_web_page_preview=True)  # chat_id, string
-    await cb.message.answer("Ура! теперь для вас оформлена подписка на " + hlink(f"{chat_name}",
-                                                f"tg://user?id={chat_id}") + " с кастингами на 90 дней.\n"
-                            "Также, если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
+    await cb.message.answer("Если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
                             "так как на большинство кастингов требуются эти материалы.\n"
                             "Записаться можно по ссылке "
                             "ниже. Выберите продукт «оплата съёмки snaps&video introduction»  ⬇️"
                             , reply_markup=url)
-    await cb.message.answer("После оплаты вышлите чек @nzsz13")
+    await cb.message.answer("После оплаты вышлите чек @nzsz13. Если есть часы на абонементе, позвоните куратору.")
     await state.finish()
-    await cb.message.answer("Если есть часы на абонементе -- позвоните куратору.")
+    await cb.message.answer("Ура! теперь для вас оформлена подписка на чат с кастингами на 90 дней.")
     # ⬇️ await state.reset_state(with_data=False) сбрасывает состояние, сохраняя данные
 
 

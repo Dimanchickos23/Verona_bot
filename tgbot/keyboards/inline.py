@@ -1,11 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-survey_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [
-        InlineKeyboardButton(text="📝 Заполнить анкету", callback_data="survey_start")
-    ]
-])
+chat_cb = CallbackData('chat', 'chat_id', 'chat_name', 'action')
 
 end_survey = InlineKeyboardMarkup(inline_keyboard=[
     [
@@ -39,7 +35,7 @@ confirmation_keyboard = InlineKeyboardMarkup(
         InlineKeyboardButton(text="Отклонить пост", callback_data=post_callback.new(action="cancel")),
     ]]
 )
-# Test_channel_id=-1001816253590
+# Test_channel_id=-1001816253590      Girls=-1001657141038
 channels_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [

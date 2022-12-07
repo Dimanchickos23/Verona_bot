@@ -2,7 +2,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class Survey(StatesGroup):
-    Start = State()
+    Begin = State()
     FIO = State()
     Age = State()
     Height = State()

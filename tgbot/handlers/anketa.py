@@ -6,7 +6,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Regexp
 from aiogram.types import CallbackQuery
-from aiogram.utils.markdown import hlink
+from aiogram.utils.markdown import hlink, hcode
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from tgbot.config import Config
@@ -92,9 +92,15 @@ async def disk_answer(message: types.Message, state: FSMContext):
 
 
 async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler: AsyncIOScheduler):
+    await cb.answer()
     bot = Bot.get_current()
     data = await state.get_data()
     anketa = data.get("anketa")
+    chat_name = data.get("chat_name")
+    chat_id = data.get("chat_id")
+    chat = await bot.get_chat(chat_id)
+    chat_link = chat.invite_link
+    # await cb.message.answer(f"Chat_id = {chat_id}\nChat_name = {chat_name}\nChat_link = {chat_link}")
     config: Config = bot.get('config')
     admin = config.tg_bot.admin_ids[0]
     await update_anketa(session, telegram_id=cb.from_user.id, anketa=anketa)
@@ -103,9 +109,9 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
                       kwargs=dict(user_id=cb.from_user.id))
     scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=90),
                       kwargs=dict(user_id=cb.from_user.id))
-    await bot.send_message(admin,f"Для пользователя " + hlink(f"{cb.from_user.full_name}",
-                                                f"tg://user?id={cb.from_user.id}") + f" оформлена первая бесплатная"
-                                                                                     f" подписка на 90 дней.")
+    await bot.send_message(admin, f"Для пользователя " + hlink(f"{cb.from_user.full_name}",
+                                                               f"tg://user?id={cb.from_user.id}") + f" оформлена первая бесплатная"
+                                                                                                    f" подписка на 90 дней.")
     await bot.send_message(admin, anketa, disable_web_page_preview=True)  # chat_id, string
     await cb.message.answer("Если у вас нет видео-визитки и снэпов желательно записаться на это занятие, "
                             "так как на большинство кастингов требуются эти материалы.\n"
@@ -113,8 +119,11 @@ async def ended_survey(cb: CallbackQuery, state: FSMContext, session, scheduler:
                             "ниже. Выберите продукт «оплата съёмки snaps&video introduction»  ⬇️"
                             , reply_markup=url)
     await cb.message.answer("После оплаты вышлите чек @nzsz13. Если есть часы на абонементе, позвоните куратору.")
+    await cb.message.answer("Ура! Теперь для вас оформлена подписка на чат "
+                            " с кастингами на 90 дней.\nКликните ссылку ниже для перехода в чат ⬇️\n" +
+                            hlink(f"{chat_name}", chat_link))
     await state.finish()
-    await cb.message.answer("Ура! теперь для вас оформлена подписка на чат с кастингами на 90 дней.")
+
     # ⬇️ await state.reset_state(with_data=False) сбрасывает состояние, сохраняя данные
 
 

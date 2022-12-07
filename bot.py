@@ -43,15 +43,15 @@ def register_all_filters(dp):
 
 
 def register_all_handlers(dp):
+    register_user(dp)
+    register_channel(dp)
     register_prolong(dp)
     register_super_admin(dp)
     register_admin(dp)
     register_test(dp)
     register_survey_error(dp)
-    register_user(dp)
-    register_channel(dp)
     register_service(dp)
-    # register_echo(dp)
+    register_echo(dp)
 
 
 async def main():

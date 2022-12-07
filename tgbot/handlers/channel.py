@@ -55,4 +55,5 @@ def register_channel(dp: Dispatcher):
     dp.register_callback_query_handler(confirm_offer, channel_cb.filter(action="confirm"), is_perspective=True)
     dp.register_callback_query_handler(decline_offer, channel_cb.filter(action="decline"), is_favorite=True)
     dp.register_callback_query_handler(decline_offer, channel_cb.filter(action="decline"), is_perspective=True)
-    dp.register_callback_query_handler(not_sub)
+    dp.register_callback_query_handler(not_sub, channel_cb.filter(action="confirm"))
+    dp.register_callback_query_handler(not_sub, channel_cb.filter(action="decline"))

@@ -1,7 +1,7 @@
 import datetime
 from typing import Callable, AsyncContextManager
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, and_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -81,8 +81,10 @@ async def subs_90_list(session):
         User.telegram_id.label('id'),
         User.full_name.label('name'),
         User.subscription_type.label('sub')
-    ).where(User.created_at.datetime.day ==
-            datetime.datetime.now().day - datetime.timedelta(days=90).days)
+    ).where(
+        and_(datetime.datetime.now() - User.created_at <= datetime.timedelta(days=91),
+             datetime.datetime.now() - User.created_at >= datetime.timedelta(days=89))
+    )
 
     result = await session.execute(statement)
     return result.all()

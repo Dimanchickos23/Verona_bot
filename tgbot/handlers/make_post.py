@@ -6,9 +6,11 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import Message, CallbackQuery, MediaGroup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from sqlalchemy import insert
 
 from reset_commands import set_all_admins_commands
-from tgbot.infrastructure.database.functions import subs_90_list
+from tgbot.infrastructure.database.functions import subs_90_list, delete_user
+from tgbot.infrastructure.database.users import User
 from tgbot.keyboards.inline import confirmation_keyboard, post_callback, channels_keyboard, channel_cb
 from tgbot.misc.states import NewPost
 
@@ -148,12 +150,26 @@ async def get_subs(message: Message, session):
     result = await subs_90_list(session)
     text = ""
     for row in result:
-        text += f"{row.id} {row.name} {row.sub} \n"
+        text += f"{row.name} {row.sub} \n"
     if text == "":
         date = datetime.datetime.now() - datetime.timedelta(days=90)
         await message.answer(f"Никто не заходил в чат "
                              f"{date.date()}")
     await message.answer(text)
+
+
+async def get_subs_test(message: Message, session):
+    result = await subs_90_list(session)
+    text = ""
+    for row in result:
+        text += f"{row.name} {row.sub} \n"
+    if text == "":
+        date = datetime.datetime.now() - datetime.timedelta(days=90)
+        await message.answer(f"Никто не заходил в чат "
+                             f"{date.date()}")
+    await message.answer(text)
+    await delete_user(session, 12345)
+
 
 
 def register_admin(dp: Dispatcher):
@@ -174,3 +190,4 @@ def register_admin(dp: Dispatcher):
     dp.register_callback_query_handler(decline_post, post_callback.filter(action="cancel"), is_admin=True,
                                        state=NewPost.Final)
     dp.register_message_handler(get_subs,commands=["get_subs"], state="*", is_admin=True)
+    dp.register_message_handler(get_subs_test, commands=["get_subs_t"], state="*", is_admin=True)

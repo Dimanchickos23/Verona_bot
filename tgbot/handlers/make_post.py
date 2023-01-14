@@ -8,6 +8,7 @@ from aiogram.types import Message, CallbackQuery, MediaGroup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from reset_commands import set_all_admins_commands
+from tgbot.infrastructure.database.functions import subs_90_list
 from tgbot.keyboards.inline import confirmation_keyboard, post_callback, channels_keyboard, channel_cb
 from tgbot.misc.states import NewPost
 
@@ -143,6 +144,18 @@ async def reset_state(message: Message, state: FSMContext):
     await state.finish()
 
 
+async def get_subs(message: Message, session):
+    result = await subs_90_list(session)
+    text = ""
+    for row in result:
+        text += f"{row.id} {row.name} {row.sub} \n"
+    if text == "":
+        date = datetime.datetime.now() - datetime.timedelta(days=90)
+        await message.answer(f"Никто не заходил в чат "
+                             f"{date.date()}")
+    await message.answer(text)
+
+
 def register_admin(dp: Dispatcher):
     dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
     dp.register_message_handler(reset_state, commands=["reset"], state="*", is_super_admin=True)
@@ -160,3 +173,4 @@ def register_admin(dp: Dispatcher):
                                        state=NewPost.Final)
     dp.register_callback_query_handler(decline_post, post_callback.filter(action="cancel"), is_admin=True,
                                        state=NewPost.Final)
+    dp.register_message_handler(get_subs,commands=["get_subs"], state="*", is_admin=True)

@@ -75,8 +75,9 @@ async def main():
         "default": RedisJobStore(
             jobs_key="dispatched_trips_jobs", run_times_key="dispatched_trips_running",
             # параметры host и port необязательны, для примера показано как передавать параметры подключения
-            # host="localhost", port=6379, password=config.tg_bot.redis_password
-            host="redis_cache", port=6379, password=config.tg_bot.redis_password
+            host="localhost", port=6379
+            # , password=config.tg_bot.redis_password
+            # host="redis_cache", port=6379, password=config.tg_bot.redis_password
         )
     }
 

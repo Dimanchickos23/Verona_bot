@@ -1,3 +1,4 @@
+import datetime
 from typing import Callable, AsyncContextManager
 
 from sqlalchemy import select, update, delete
@@ -73,3 +74,15 @@ async def update_anketa(session, telegram_id, anketa):
     )
     await session.execute(statement)
     await session.commit()
+
+
+async def subs_90_list(session):
+    statement = select(
+        User.telegram_id.label('id'),
+        User.full_name.label('name'),
+        User.subscription_type.label('sub')
+    ).where(User.created_at.datetime.day ==
+            datetime.datetime.now().day - datetime.timedelta(days=90).days)
+
+    result = await session.execute(statement)
+    return result.all()

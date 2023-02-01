@@ -34,6 +34,7 @@ class TgBot:
     admin_ids: list[int]
     use_redis: bool
     redis_password: str
+    super_ids: list[int]
 
 
 @dataclass
@@ -57,7 +58,8 @@ def load_config(path: str = None):
             token=env.str("BOT_TOKEN"),
             admin_ids=list(map(int, env.list("ADMINS"))),
             use_redis=env.bool("USE_REDIS"),
-            redis_password=env.str('REDIS_PASSWORD')
+            redis_password=env.str('REDIS_PASSWORD'),
+            super_ids=list(map(int, env.list("SUPER")))
         ),
         db=DbConfig(
             host=env.str('DB_HOST'),
@@ -67,3 +69,5 @@ def load_config(path: str = None):
         ),
         misc=Miscellaneous()
     )
+
+

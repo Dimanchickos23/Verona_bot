@@ -2,6 +2,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class Survey(StatesGroup):
+    Begin = State()
     FIO = State()
     Age = State()
     Height = State()
@@ -14,11 +15,14 @@ class Survey(StatesGroup):
 
 
 class Prolong(StatesGroup):
-    F = State()
+    F1 = State()
+    F2 = State()
     P = State()
+    D = State()
 
 class NewPost(StatesGroup):
     EnterMessage = State()
+    EnterPhoto = State()
     When = State()
     Channel = State()
     Confirm = State()
@@ -27,3 +31,8 @@ class NewPost(StatesGroup):
 
 class DataState(StatesGroup):
     One = State()
+
+
+class SuperAdmin(StatesGroup):
+    AddAdmin = State()
+    DeleteAdmin = State()

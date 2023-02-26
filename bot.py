@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from apscheduler.jobstores.redis import RedisJobStore
@@ -13,8 +13,8 @@ from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.filters.super_admin import SuperAdminFilter
 from tgbot.handlers.anketa_errors import register_survey_error
+from tgbot.handlers.channel_data import register_channel_data
 from tgbot.handlers.make_post import register_admin
-from tgbot.handlers.echo import register_echo
 from tgbot.handlers.service_msgs import register_service
 from tgbot.handlers.super_admin import register_super_admin
 from tgbot.handlers.user import register_user
@@ -50,8 +50,8 @@ def register_all_handlers(dp):
     register_admin(dp)
     register_test(dp)
     register_survey_error(dp)
+    register_channel_data(dp)
     register_service(dp)
-    register_echo(dp)
 
 
 async def main():

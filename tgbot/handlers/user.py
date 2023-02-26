@@ -7,20 +7,16 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 from aiogram.utils.markdown import hlink
 
 from tgbot.config import Config
-from tgbot.infrastructure.database.functions import delete_user
+from tgbot.infrastructure.database.functions import delete_user, update_chat_id
 from tgbot.keyboards.inline import chat_cb
 from tgbot.misc import Survey
 
 
-async def user_join(join: types.ChatJoinRequest):
-    # тут мы принимаем юзера в канал
+async def user_join(join: types.ChatJoinRequest, session):
     await join.approve()
-    # Тут надо занести в БД
-
     bot = Bot.get_current()
-
-    # а тут отправляем сообщение
     chat_id = join.chat.id
+    await update_chat_id(session,join.from_user.id, chat_id)
     chat_name = join.chat.full_name
     start_survey_button = InlineKeyboardButton(text="📝 Заполнить анкету",
                                                callback_data=chat_cb.new(chat_id=chat_id,
@@ -51,6 +47,15 @@ async def user_left(m: types.ChatMember, session):
                            f" вышел из канала")
 
 
+async def user_left_chat(m: types.Message, session):
+    await delete_user(session, m.from_user.id)
+    bot = Bot.get_current()
+    config: Config = bot.get('config')
+    admin = config.tg_bot.admin_ids[0]
+    await bot.send_message(admin, hlink(f"{m.from_user.full_name}", f"tg://user?id={m.from_user.id}") +
+                           f" вышел из канала")
+
+
 async def start_survey(cb: CallbackQuery, state: FSMContext, callback_data: dict):
     await cb.answer()
     await cb.message.answer("Введите ваше ФИО:")
@@ -66,3 +71,4 @@ def register_user(dp: Dispatcher):
     dp.register_chat_join_request_handler(user_join, state="*")
     dp.register_callback_query_handler(start_survey, chat_cb.filter(action='start_survey'))
     dp.chat_member_handler(user_left, state="*")
+    dp.register_message_handler(user_left_chat,content_types=[types.ContentType.LEFT_CHAT_MEMBER])

@@ -4,7 +4,7 @@ from aiogram import Dispatcher, Bot, types
 from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.utils.markdown import hlink
 
-from tgbot.infrastructure.database.functions import get_user
+from tgbot.infrastructure.database.functions import get_user, update_chat_id
 from tgbot.infrastructure.database.users import User
 from tgbot.keyboards.inline import channel_cb
 
@@ -26,6 +26,8 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
                                     "В случае успешного прохождения кастинга, букер свяжется с вами."
                            )
     user: User = await get_user(session, cb.from_user.id)
+    if not user.chat_id:
+        await update_chat_id(session,cb.from_user.id,cb.message.chat.id)
     anketa = user.anketa
     await bot.send_message(chat_id=who_posted_id, text="Модель " + hlink(
         f"{cb.from_user.full_name}",
@@ -36,8 +38,11 @@ async def confirm_offer(cb: CallbackQuery, callback_data: dict, session):
                            disable_web_page_preview=True)
 
 
-async def decline_offer(cb: CallbackQuery, callback_data: dict):
+async def decline_offer(cb: CallbackQuery, callback_data: dict, session):
     await cb.answer("Спасибо за отклик", cache_time=10)
+    user: User = await get_user(session, cb.from_user.id)
+    if not user.chat_id:
+        await update_chat_id(session, cb.from_user.id, cb.message.chat.id)
     who_posted_id = int(callback_data['id'])
     logging.info(f"{who_posted_id=}")
     bot = Bot.get_current()

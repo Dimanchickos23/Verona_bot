@@ -36,3 +36,7 @@ class DataState(StatesGroup):
 class SuperAdmin(StatesGroup):
     AddAdmin = State()
     DeleteAdmin = State()
+
+class ChannelData(StatesGroup):
+    ChooseChannel = State()
+    ShowData = State()

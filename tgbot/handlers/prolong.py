@@ -19,7 +19,7 @@ async def remove_favorite(user_id: int):
     dp = Dispatcher.get_current()
     session_pool = dp.middleware.applications[0].kwargs.get('session_pool')
     async with session_pool() as session:
-        await update_user(session, telegram_id=user_id, subscription_type=None)
+        await update_user(session, telegram_id=user_id, subscription_type=None, subscription_date=None)
     bot = Bot.get_current()
     m = await bot.send_message(user_id,
                                f"У вас кончилась подписка")  # тут надо как то отправить сообщение админу, что у пользователя кончилась подписка
@@ -80,7 +80,7 @@ async def add_favorite(m: types.Message, scheduler: AsyncIOScheduler, state: FSM
     logging.info(f"{user_id}")
     data = await state.get_data()
     days = data.get("days")
-    await update_user(session, telegram_id=user_id, subscription_type='favorite')
+    await update_user(session, telegram_id=user_id, subscription_type='favorite', subscription_date=datetime.datetime.now())
     scheduler.add_job(prolong_handler, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=days-1),
                       kwargs=dict(user_id=user_id))
     scheduler.add_job(remove_favorite, 'date', run_date=datetime.datetime.now() + datetime.timedelta(days=days),

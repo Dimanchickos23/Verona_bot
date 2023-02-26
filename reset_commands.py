@@ -9,7 +9,8 @@ async def set_all_admins_commands(bot: Bot, chat_id: int):
         types.BotCommand("add_f", "Установить пользователю подписку на 90 дней."),
         types.BotCommand("add_p", "Установить вечную подписку пользователю."),
         types.BotCommand("del_sub", "Удалить статус подписки у пользователя."),
-        types.BotCommand("get_subs", "Список вошедших 90 дней назад")
+        types.BotCommand("get_subs", "Список вошедших 90 дней назад"),
+        types.BotCommand("data", "Данные о канале")
     ],
         scope=BotCommandScopeChat(chat_id)
     )
@@ -23,7 +24,8 @@ async def set_all_super_admins_commands(bot: Bot, chat_id: int):
         types.BotCommand("del_sub", "Удалить статус подписки у пользователя."),
         types.BotCommand("add_admin", "Добавить админа."),
         types.BotCommand("del_admin", "Удалить админа."),
-        types.BotCommand("get_subs", "Список вошедших 90 дней назад")
+        types.BotCommand("get_subs", "Список вошедших 90 дней назад"),
+        types.BotCommand("data", "Данные о канале")
     ],
         scope=BotCommandScopeChat(chat_id)
     )
